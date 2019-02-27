@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">TAIDemo</string>
+    <string name="formula_placeholder">点击查看算式</string>
+    <string name="recognize_title">识别图片</string>
+    <string name="pick_title">选择图片</string>
+
+    <string name="reftext_placeholder">评测内容</string>
+    <string name="scorecoeff_placeholder">苛刻指数[1.0-4.0]</string>
+    <string name="start_record">开始录制</string>
+    <string name="stop_record">停止录制</string>
+    <string name="local_mp3">外部mp3文件</string>
+    <string name="work_once">一次传输</string>
+    <string name="work_stream">流式传输</string>
+    <string name="eval_word">单词</string>
+    <string name="eval_sentence">句子</string>
+    <string name="eval_paragraph">段落</string>
+    <string name="eval_free">自由</string>
+    <string name="storage_disable">放弃存储</string>
+    <string name="storage_enable">存储音频</string>
+    <string name="type_english">英文</string>
+    <string name="type_chinese">中文</string>
+</resources>
