@@ -28,6 +28,7 @@ import com.tencent.taisdk.TAIOralEvaluationStorageMode;
 import com.tencent.taisdk.TAIOralEvaluationWorkMode;
 
 import java.io.InputStream;
+import java.util.UUID;
 
 
 public class OralEvaluationActivity extends AppCompatActivity {
@@ -121,7 +122,7 @@ public class OralEvaluationActivity extends AppCompatActivity {
             this.logText.setText("");
             TAIOralEvaluationParam param = new TAIOralEvaluationParam();
             param.context = this;
-            param.sessionId = String.format("%d", System.currentTimeMillis() / 1000);
+            param.sessionId = UUID.randomUUID().toString();
             param.appId = PrivateInfo.appId;
             param.secretId = PrivateInfo.secretId;
             param.secretKey = PrivateInfo.secretKey;
@@ -189,7 +190,7 @@ public class OralEvaluationActivity extends AppCompatActivity {
         this.logText.setText("");
         TAIOralEvaluationParam param = new TAIOralEvaluationParam();
         param.context = this;
-        param.sessionId = String.format("%d", System.currentTimeMillis() / 1000);
+        param.sessionId = UUID.randomUUID().toString();
         param.appId = PrivateInfo.appId;
         param.secretId = PrivateInfo.secretId;
         param.secretKey = PrivateInfo.secretKey;
