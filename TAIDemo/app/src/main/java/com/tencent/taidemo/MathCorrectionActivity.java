@@ -39,6 +39,7 @@ import com.tencent.taisdk.TAIMathCorrectionRet;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.InputStream;
+import java.util.UUID;
 
 public class MathCorrectionActivity extends AppCompatActivity {
     private static final int FROM_CAMERA = 1;
@@ -91,7 +92,7 @@ public class MathCorrectionActivity extends AppCompatActivity {
     {
         TAIMathCorrectionParam param = new TAIMathCorrectionParam();
         param.context = this;
-        param.sessionId = String.format("%d", System.currentTimeMillis() / 1000);
+        param.sessionId = UUID.randomUUID().toString();
         param.appId = PrivateInfo.appId;
         param.secretId = PrivateInfo.secretId;
         param.secretKey = PrivateInfo.secretKey;
