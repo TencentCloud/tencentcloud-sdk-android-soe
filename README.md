@@ -83,7 +83,7 @@ this.oral.setListener(new TAIOralEvaluationListener() {
 TAIOralEvaluationParam param = new TAIOralEvaluationParam();
 param.context = this;
 param.appId = "";
-param.sessionId = String.format("%d", System.currentTimeMillis() / 1000);
+param.sessionId = UUID.randomUUID().toString();
 param.workMode = TAIOralEvaluationWorkMode.ONCE;
 param.evalMode = TAIOralEvaluationEvalMode.SENTENCE;
 param.storageMode = TAIOralEvaluationStorageMode.DISABLE;
@@ -122,7 +122,7 @@ this.oral.stopRecordAndEvaluation(new TAIOralEvaluationCallback() {
 TAIOralEvaluationParam param = new TAIOralEvaluationParam();
 param.context = this;
 param.appId = "";
-param.sessionId = String.format("%d", System.currentTimeMillis() / 1000);
+param.sessionId = UUID.randomUUID().toString();
 param.workMode = TAIOralEvaluationWorkMode.ONCE;
 param.evalMode = TAIOralEvaluationEvalMode.SENTENCE;
 param.storageMode = TAIOralEvaluationStorageMode.DISABLE;
