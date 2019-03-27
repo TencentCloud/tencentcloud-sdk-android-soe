@@ -3,6 +3,9 @@
     xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -95,6 +98,24 @@
 
         </RadioGroup>
 
+        <RadioGroup
+            android:id="@+id/textMode"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <RadioButton
+                android:id="@+id/textModeNormal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/textmode_normal" />
+            <RadioButton
+                android:id="@+id/textModePhoneme"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/textmode_phoneme" />
+
+        </RadioGroup>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -129,8 +150,12 @@
             <TextView
                 android:id="@+id/logText"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent"
+                android:enabled="true"
+                android:textIsSelectable="true"
+                android:focusable="true"
+                android:longClickable="true" />
         </ScrollView>
     </LinearLayout>
-
+    </ScrollView>
 </android.support.constraint.ConstraintLayout>

@@ -25,6 +25,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -106,9 +107,24 @@ public class MathCorrectionActivity extends AppCompatActivity {
         this.progressBar.setVisibility(View.VISIBLE);
         this.correction.mathCorrection(param, new TAIMathCorrectionCallback() {
             @Override
-            public void onError(TAIError error) {
-                MathCorrectionActivity.this.progressBar.setVisibility(View.INVISIBLE);
-                Toast.makeText(MathCorrectionActivity.this, error.desc, Toast.LENGTH_SHORT).show();
+            public void onError(final TAIError error) {
+                MathCorrectionActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        MathCorrectionActivity.this.progressBar.setVisibility(View.INVISIBLE);
+                        new AlertDialog.Builder(MathCorrectionActivity.this)
+                                .setTitle("提示")
+                                .setMessage(String.format("错误码：%d\n错误信息：%s", error.code, error.desc))
+                                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                    }
+                                })
+                                .create()
+                                .show();
+                    }
+                });
             }
 
             @Override
@@ -143,6 +159,17 @@ public class MathCorrectionActivity extends AppCompatActivity {
                                 }
                                 view.setLayoutParams(layoutParams);
                             }
+                            new AlertDialog.Builder(MathCorrectionActivity.this)
+                                    .setTitle("提示")
+                                    .setMessage(String.format("识别到%d个算式", result.items.size()))
+                                    .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            dialog.dismiss();
+                                        }
+                                    })
+                                    .create()
+                                    .show();
                         }
                     });
             }

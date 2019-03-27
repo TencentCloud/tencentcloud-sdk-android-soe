@@ -3,9 +3,11 @@ package com.tencent.taidemo;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -25,9 +27,14 @@ import com.tencent.taisdk.TAIOralEvaluationParam;
 import com.tencent.taisdk.TAIOralEvaluationRet;
 import com.tencent.taisdk.TAIOralEvaluationServerType;
 import com.tencent.taisdk.TAIOralEvaluationStorageMode;
+import com.tencent.taisdk.TAIOralEvaluationTextMode;
 import com.tencent.taisdk.TAIOralEvaluationWorkMode;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.RandomAccessFile;
 import java.util.UUID;
 
 
@@ -47,6 +54,8 @@ public class OralEvaluationActivity extends AppCompatActivity {
     private RadioButton storageEnableBtn;
     private RadioButton typeEnglishBtn;
     private RadioButton typeChineseBtn;
+    private RadioButton textModeNoramlBtn;
+    private RadioButton textModePhonemeBtn;
     private EditText scoreCoeff;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +80,10 @@ public class OralEvaluationActivity extends AppCompatActivity {
         this.typeEnglishBtn = this.findViewById(R.id.typeEnglish);
         this.typeChineseBtn = this.findViewById(R.id.typeChinese);
         this.typeEnglishBtn.setChecked(true);
+        this.textModeNoramlBtn = this.findViewById(R.id.textModeNormal);
+        this.textModeNoramlBtn.setChecked(true);
+        this.textModePhonemeBtn = this.findViewById(R.id.textModePhoneme);
+
         this.scoreCoeff = this.findViewById(R.id.scoreCoeff);
         this.scoreCoeff.setText("1.0");
         this.requestPermission();
@@ -80,23 +93,6 @@ public class OralEvaluationActivity extends AppCompatActivity {
     public void onRecord(View view) {
         if(this.oral == null){
             this.oral = new TAIOralEvaluation();
-            this.oral.setListener(new TAIOralEvaluationListener() {
-                @Override
-                public void onEvaluationData(final TAIOralEvaluationData data, final TAIOralEvaluationRet result, final TAIError error) {
-                    OralEvaluationActivity.this.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            if(error.code != TAIErrCode.SUCC){
-                                OralEvaluationActivity.this.recordBtn.setText(R.string.start_record);
-                            }
-                            Gson gson = new Gson();
-                            String errString = gson.toJson(error);
-                            String retString = gson.toJson(result);
-                            OralEvaluationActivity.this.setResponse(String.format("oralEvaluation:seq:%d, end:%d, error:%s, ret:%s", data.seqId, data.bEnd ? 1 : 0, errString, retString));
-                        }
-                    });
-                }
-            });
         }
         if(oral.isRecording()){
             this.oral.stopRecordAndEvaluation(new TAIOralEvaluationCallback() {
@@ -115,6 +111,26 @@ public class OralEvaluationActivity extends AppCompatActivity {
             });
         }
         else{
+            final String mp3FileName = String.format("taisdk_%d.mp3", System.currentTimeMillis()/1000);
+            this.oral.setListener(new TAIOralEvaluationListener() {
+                @Override
+                public void onEvaluationData(final TAIOralEvaluationData data, final TAIOralEvaluationRet result, final TAIError error) {
+                    OralEvaluationActivity.writeFileToSDCard(data.audio, "com.tencent.taidemo", mp3FileName, true, false);
+                    OralEvaluationActivity.this.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if(error.code != TAIErrCode.SUCC){
+                                OralEvaluationActivity.this.recordBtn.setText(R.string.start_record);
+                            }
+                            Gson gson = new Gson();
+                            String errString = gson.toJson(error);
+                            String retString = gson.toJson(result);
+                            OralEvaluationActivity.this.setResponse(String.format("oralEvaluation:seq:%d, end:%d, error:%s, ret:%s", data.seqId, data.bEnd ? 1 : 0, errString, retString));
+                        }
+                    });
+                }
+            });
+
             if(this.scoreCoeff.getText().toString().equals("")){
                 this.setResponse("startRecordAndEvaluation:scoreCoeff invalid");
                 return;
@@ -124,6 +140,7 @@ public class OralEvaluationActivity extends AppCompatActivity {
             param.context = this;
             param.sessionId = UUID.randomUUID().toString();
             param.appId = PrivateInfo.appId;
+            param.soeAppId = PrivateInfo.soeAppId;
             param.secretId = PrivateInfo.secretId;
             param.secretKey = PrivateInfo.secretKey;
             int evalMode = TAIOralEvaluationEvalMode.SENTENCE;
@@ -144,8 +161,17 @@ public class OralEvaluationActivity extends AppCompatActivity {
             param.storageMode = this.storageDisableBtn.isChecked() ? TAIOralEvaluationStorageMode.DISABLE : TAIOralEvaluationStorageMode.ENABLE;
             param.fileType = TAIOralEvaluationFileType.MP3;
             param.serverType = this.typeChineseBtn.isChecked() ? TAIOralEvaluationServerType.CHINESE : TAIOralEvaluationServerType.ENGLISH;
+            param.textMode = this.textModeNoramlBtn.isChecked() ? TAIOralEvaluationTextMode.NORMAL : TAIOralEvaluationTextMode.PHONEME;
             param.scoreCoeff = Double.parseDouble(this.scoreCoeff.getText().toString());
             param.refText = this.refText.getText().toString();
+            if(param.workMode == TAIOralEvaluationWorkMode.STREAM){
+                param.timeout = 5;
+                param.retryTimes = 5;
+            }
+            else{
+                param.timeout = 30;
+                param.retryTimes = 0;
+            }
             this.oral.startRecordAndEvaluation(param, new TAIOralEvaluationCallback() {
                 @Override
                 public void onResult(final TAIError error) {
@@ -192,6 +218,7 @@ public class OralEvaluationActivity extends AppCompatActivity {
         param.context = this;
         param.sessionId = UUID.randomUUID().toString();
         param.appId = PrivateInfo.appId;
+        param.soeAppId = PrivateInfo.soeAppId;
         param.secretId = PrivateInfo.secretId;
         param.secretKey = PrivateInfo.secretKey;
         param.workMode = TAIOralEvaluationWorkMode.ONCE;
@@ -199,9 +226,9 @@ public class OralEvaluationActivity extends AppCompatActivity {
         param.storageMode = TAIOralEvaluationStorageMode.DISABLE;
         param.fileType = TAIOralEvaluationFileType.MP3;
         param.serverType = TAIOralEvaluationServerType.ENGLISH;
+        param.textMode = TAIOralEvaluationTextMode.NORMAL;
         param.scoreCoeff = Double.parseDouble(this.scoreCoeff.getText().toString());
         param.refText = "hello guagua";
-
 
         try{
             InputStream is = getAssets().open("hello_guagua.mp3");
@@ -248,5 +275,77 @@ public class OralEvaluationActivity extends AppCompatActivity {
     {
         String old = this.logText.getText().toString();
         this.logText.setText(String.format("%s\n%s", old, rsp));
+    }
+
+
+    public synchronized static void writeFileToSDCard(final byte[] buffer, final String folder,
+                                                      final String fileName, final boolean append, final boolean autoLine) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                boolean sdCardExist = Environment.getExternalStorageState().equals(
+                        android.os.Environment.MEDIA_MOUNTED);
+                String folderPath = "";
+                if (sdCardExist) {
+                    //TextUtils为android自带的帮助类
+                    if (TextUtils.isEmpty(folder)) {
+                        //如果folder为空，则直接保存在sd卡的根目录
+                        folderPath = Environment.getExternalStorageDirectory()
+                                + File.separator;
+                    } else {
+                        folderPath = Environment.getExternalStorageDirectory()
+                                + File.separator + folder + File.separator;
+                    }
+                } else {
+                    return;
+                }
+
+
+                File fileDir = new File(folderPath);
+                if (!fileDir.exists()) {
+                    if (!fileDir.mkdirs()) {
+                        return;
+                    }
+                }
+                File file;
+                //判断文件名是否为空
+                if (TextUtils.isEmpty(fileName)) {
+                    file = new File(folderPath + "app_log.txt");
+                } else {
+                    file = new File(folderPath + fileName);
+                }
+                RandomAccessFile raf = null;
+                FileOutputStream out = null;
+                try {
+                    if (append) {
+                        //如果为追加则在原来的基础上继续写文件
+                        raf = new RandomAccessFile(file, "rw");
+                        raf.seek(file.length());
+                        raf.write(buffer);
+                        if (autoLine) {
+                            raf.write("\n".getBytes());
+                        }
+                    } else {
+                        //重写文件，覆盖掉原来的数据
+                        out = new FileOutputStream(file);
+                        out.write(buffer);
+                        out.flush();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        if (raf != null) {
+                            raf.close();
+                        }
+                        if (out != null) {
+                            out.close();
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }).start();
     }
 }
