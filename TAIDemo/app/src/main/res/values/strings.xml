@@ -6,6 +6,7 @@
 
     <string name="reftext_placeholder">评测内容</string>
     <string name="scorecoeff_placeholder">苛刻指数[1.0-4.0]</string>
+    <string name="fragsize_placeholder">分片大小[单位k]</string>
     <string name="start_record">开始录制</string>
     <string name="stop_record">停止录制</string>
     <string name="local_mp3">外部mp3文件</string>

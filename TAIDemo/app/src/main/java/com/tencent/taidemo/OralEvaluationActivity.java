@@ -35,6 +35,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.UUID;
 
 
@@ -57,6 +59,7 @@ public class OralEvaluationActivity extends AppCompatActivity {
     private RadioButton textModeNoramlBtn;
     private RadioButton textModePhonemeBtn;
     private EditText scoreCoeff;
+    private EditText fragSize;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,6 +89,9 @@ public class OralEvaluationActivity extends AppCompatActivity {
 
         this.scoreCoeff = this.findViewById(R.id.scoreCoeff);
         this.scoreCoeff.setText("1.0");
+
+        this.fragSize = this.findViewById(R.id.fragSize);
+        this.fragSize.setText("1.0");
         this.requestPermission();
     }
 
@@ -135,6 +141,10 @@ public class OralEvaluationActivity extends AppCompatActivity {
                 this.setResponse("startRecordAndEvaluation:scoreCoeff invalid");
                 return;
             }
+            if(this.fragSize.getText().toString().equals("")){
+                this.setResponse("startRecordAndEvaluation:fragSize invalid");
+                return;
+            }
             this.logText.setText("");
             TAIOralEvaluationParam param = new TAIOralEvaluationParam();
             param.context = this;
@@ -172,6 +182,7 @@ public class OralEvaluationActivity extends AppCompatActivity {
                 param.timeout = 30;
                 param.retryTimes = 0;
             }
+            this.oral.setFragSize((int)(Double.parseDouble(this.fragSize.getText().toString()) * 1024));
             this.oral.startRecordAndEvaluation(param, new TAIOralEvaluationCallback() {
                 @Override
                 public void onResult(final TAIError error) {
@@ -273,8 +284,11 @@ public class OralEvaluationActivity extends AppCompatActivity {
 
     private void setResponse(String rsp)
     {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss:SSS");
+        String date = format.format(new Date(System.currentTimeMillis()));
+        String newS = String.format("%s %s", date, rsp);
         String old = this.logText.getText().toString();
-        this.logText.setText(String.format("%s\n%s", old, rsp));
+        this.logText.setText(String.format("%s\n%s", old, newS));
     }
 
 
