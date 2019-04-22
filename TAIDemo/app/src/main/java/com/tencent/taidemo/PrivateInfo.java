@@ -7,4 +7,5 @@ public class PrivateInfo {
     static final String hcmAppId = "";
     static final String secretId = "";
     static final String secretKey = "";
+    static final String token = "";
 }

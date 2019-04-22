@@ -153,6 +153,7 @@ public class OralEvaluationActivity extends AppCompatActivity {
             param.soeAppId = PrivateInfo.soeAppId;
             param.secretId = PrivateInfo.secretId;
             param.secretKey = PrivateInfo.secretKey;
+            param.token = PrivateInfo.token;
             int evalMode = TAIOralEvaluationEvalMode.SENTENCE;
             if(this.evalWordBtn.isChecked()){
                 evalMode = TAIOralEvaluationEvalMode.WORD;
@@ -232,6 +233,7 @@ public class OralEvaluationActivity extends AppCompatActivity {
         param.soeAppId = PrivateInfo.soeAppId;
         param.secretId = PrivateInfo.secretId;
         param.secretKey = PrivateInfo.secretKey;
+        param.token = PrivateInfo.token;
         param.workMode = TAIOralEvaluationWorkMode.ONCE;
         param.evalMode = TAIOralEvaluationEvalMode.SENTENCE;
         param.storageMode = TAIOralEvaluationStorageMode.DISABLE;
