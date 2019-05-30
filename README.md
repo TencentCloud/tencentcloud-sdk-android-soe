@@ -159,6 +159,42 @@ catch (Exception e){
 > 外部录制三种格式目前仅支持16k采样率16bit编码单声道，如有不一致可能导致评估不准确或失败
 
 
+* 静音检测
+
+```java
+//在开始调用`startRecordAndEvaluation`前设置录制参数
+TAIRecorderParam recordParam = new TAIRecorderParam();
+recordParam.fragSize = 1024;
+recordParam.fragEnable = true;
+recordParam.vadEnable = true;
+recordParam.vadInterval = 5000;
+this.oral.setRecorderParam(recordParam);
+```
+
+当检测到静音或者录音分贝变化时，通过`TAIOralEvaluationListener`通知上层。
+
+```java
+//检测到静音
+@Override
+public void onEndOfSpeech() {
+    //这里可以根据业务逻辑处理，如停止录音或提示用户
+}
+
+//音量发生变化
+public void onVolumeChanged(final int volume) {
+    //回调录音分贝大小[0-120]
+}
+```
+
+`TAIRecorderParam`参数说明
+
+| 参数|类型|说明 |
+|---|---|---|---|
+|fragEnable|boolean|是否开启分片，默认YES|
+|fragSize|int|分片大小，默认1024，建议为1024的整数倍，范围【1k-10k】|
+|vadEnable|boolean|是否开启静音检测，默认NO|
+|vadInterval|int|静音检测时间间隔，单位【ms】|
+
 #### 3、签名
 
 secretKey属于安全敏感参数，线上版本一般由业务后台生成[临时secretKey](https://cloud.tencent.com/document/api/598/13895)或者SDK外部签名返回到客户端。
