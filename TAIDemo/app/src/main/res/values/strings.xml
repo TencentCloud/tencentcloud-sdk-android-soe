@@ -22,4 +22,6 @@
     <string name="type_chinese">中文</string>
     <string name="textmode_normal">普通文本</string>
     <string name="textmode_phoneme">音素结构文本</string>
+    <string name="vad_interval">静音时长（ms）</string>
+    <string name="vad_volume">音量</string>
 </resources>

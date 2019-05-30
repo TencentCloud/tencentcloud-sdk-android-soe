@@ -8,9 +8,11 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.TextView;
 
@@ -29,6 +31,7 @@ import com.tencent.taisdk.TAIOralEvaluationServerType;
 import com.tencent.taisdk.TAIOralEvaluationStorageMode;
 import com.tencent.taisdk.TAIOralEvaluationTextMode;
 import com.tencent.taisdk.TAIOralEvaluationWorkMode;
+import com.tencent.taisdk.TAIRecorderParam;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -60,6 +63,8 @@ public class OralEvaluationActivity extends AppCompatActivity {
     private RadioButton textModePhonemeBtn;
     private EditText scoreCoeff;
     private EditText fragSize;
+    private EditText vadInterval;
+    private ProgressBar vadVolume;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -92,6 +97,11 @@ public class OralEvaluationActivity extends AppCompatActivity {
 
         this.fragSize = this.findViewById(R.id.fragSize);
         this.fragSize.setText("1.0");
+
+        this.vadVolume = this.findViewById(R.id.vadVolume);
+
+        this.vadInterval = this.findViewById(R.id.vadInterval);
+        this.vadInterval.setText("5000");
         this.requestPermission();
     }
 
@@ -132,6 +142,27 @@ public class OralEvaluationActivity extends AppCompatActivity {
                             String errString = gson.toJson(error);
                             String retString = gson.toJson(result);
                             OralEvaluationActivity.this.setResponse(String.format("oralEvaluation:seq:%d, end:%d, error:%s, ret:%s", data.seqId, data.bEnd ? 1 : 0, errString, retString));
+                        }
+                    });
+                }
+
+                @Override
+                public void onEndOfSpeech() {
+                    OralEvaluationActivity.this.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            OralEvaluationActivity.this.setResponse("onEndOfSpeech");
+                            OralEvaluationActivity.this.onRecord(null);
+                        }
+                    });
+                }
+
+                @Override
+                public void onVolumeChanged(final int volume) {
+                    OralEvaluationActivity.this.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            OralEvaluationActivity.this.vadVolume.setProgress(volume);
                         }
                     });
                 }
@@ -183,7 +214,12 @@ public class OralEvaluationActivity extends AppCompatActivity {
                 param.timeout = 30;
                 param.retryTimes = 0;
             }
-            this.oral.setFragSize((int)(Double.parseDouble(this.fragSize.getText().toString()) * 1024));
+            TAIRecorderParam recordParam = new TAIRecorderParam();
+            recordParam.fragSize = (int)(Double.parseDouble(this.fragSize.getText().toString()) * 1024);
+            recordParam.fragEnable = !this.workOnceBtn.isChecked();
+            recordParam.vadEnable = true;
+            recordParam.vadInterval = 4000;
+            this.oral.setRecorderParam(recordParam);
             this.oral.startRecordAndEvaluation(param, new TAIOralEvaluationCallback() {
                 @Override
                 public void onResult(final TAIError error) {
@@ -223,6 +259,16 @@ public class OralEvaluationActivity extends AppCompatActivity {
                         }
                     });
                 }
+
+                @Override
+                public void onEndOfSpeech() {
+
+                }
+
+                @Override
+                public void onVolumeChanged(int volume) {
+
+                }
             });
         }
         this.logText.setText("");
@@ -233,7 +279,6 @@ public class OralEvaluationActivity extends AppCompatActivity {
         param.soeAppId = PrivateInfo.soeAppId;
         param.secretId = PrivateInfo.secretId;
         param.secretKey = PrivateInfo.secretKey;
-        param.token = PrivateInfo.token;
         param.workMode = TAIOralEvaluationWorkMode.ONCE;
         param.evalMode = TAIOralEvaluationEvalMode.SENTENCE;
         param.storageMode = TAIOralEvaluationStorageMode.DISABLE;
