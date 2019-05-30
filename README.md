@@ -189,7 +189,7 @@ public void onVolumeChanged(final int volume) {
 `TAIRecorderParam`参数说明
 
 | 参数|类型|说明 |
-|---|---|---|---|
+|---|---|---|
 |fragEnable|boolean|是否开启分片，默认YES|
 |fragSize|int|分片大小，默认1024，建议为1024的整数倍，范围【1k-10k】|
 |vadEnable|boolean|是否开启静音检测，默认NO|
