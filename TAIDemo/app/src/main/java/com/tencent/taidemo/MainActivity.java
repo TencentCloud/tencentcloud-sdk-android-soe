@@ -8,6 +8,8 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.tencent.taisdk.TAIManager;
+
 public class MainActivity extends AppCompatActivity {
     private ListView listView;
     private String[] activityTitles = {"数学批改", "口语评测"};
@@ -16,6 +18,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.setTitle(String.format("教育AI（%s）", TAIManager.getVersion()));
         setContentView(R.layout.activity_main);
         this.listView = this.findViewById(R.id.listView);
         this.listView.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, activityTitles));
