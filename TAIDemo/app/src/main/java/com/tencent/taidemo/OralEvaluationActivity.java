@@ -218,7 +218,7 @@ public class OralEvaluationActivity extends AppCompatActivity {
             recordParam.fragSize = (int)(Double.parseDouble(this.fragSize.getText().toString()) * 1024);
             recordParam.fragEnable = !this.workOnceBtn.isChecked();
             recordParam.vadEnable = true;
-            recordParam.vadInterval = 4000;
+            recordParam.vadInterval = Integer.parseInt(this.vadInterval.getText().toString());
             this.oral.setRecorderParam(recordParam);
             this.oral.startRecordAndEvaluation(param, new TAIOralEvaluationCallback() {
                 @Override
