@@ -187,7 +187,7 @@ public class MathCorrectionActivity extends AppCompatActivity {
         } catch (Exception e) {
         }
         if (Build.VERSION.SDK_INT >= 24) {
-            this.imageUri = FileProvider.getUriForFile(getApplicationContext(), "com.tencent.taidemo.provider", outputImage);
+            this.imageUri = FileProvider.getUriForFile(getApplicationContext(), "com.tencent.taidemo.myprovider", outputImage);
         } else {
             this.imageUri = Uri.fromFile(outputImage);
         }
