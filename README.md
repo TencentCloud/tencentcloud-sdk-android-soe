@@ -18,7 +18,7 @@ secretId和secretKey是使用SDK的安全凭证，通过以下方式获取
 在build.gradle引入依赖包
 
 ```java
-implementation 'com.tencent.taisdk:TAISDK:1.2.3.35'
+implementation 'com.tencent.taisdk:TAISDK:1.2.3.40'
 ```
 
 #### 2、接口调用

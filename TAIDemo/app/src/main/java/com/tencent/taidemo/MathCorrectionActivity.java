@@ -141,7 +141,12 @@ public class MathCorrectionActivity extends AppCompatActivity {
                                 view.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
-                                        MathCorrectionActivity.this.textView.setText(item.formula);
+                                        if (item.result) {
+                                            MathCorrectionActivity.this.textView.setText(String.format("正确：%s", item.formula));
+                                        }
+                                        else {
+                                            MathCorrectionActivity.this.textView.setText(String.format("错误：%s, 答案：%s", item.formula, item.answer));
+                                        }
                                     }
                                 });
                                 MathCorrectionActivity.this.relativeLayout.addView(view);
