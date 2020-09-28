@@ -93,7 +93,14 @@ param.scoreCoeff = 1.0;
 param.refText = "";
 param.secretId = "";
 param.secretKey = "";
-//四、开始录制
+//四、设置分片和静音检测
+TAIRecorderParam recordParam = new TAIRecorderParam();
+recordParam.fragSize = 1024;
+recordParam.fragEnable = true;
+recordParam.vadEnable = true;
+recordParam.vadInterval = Integer.parseInt(this.vadInterval.getText().toString());
+this.oral.setRecorderParam(recordParam);
+//五、开始录制
 this.oral.startRecordAndEvaluation(param, new TAIOralEvaluationCallback() {
     @Override
     public void onResult(final TAIError error) {
