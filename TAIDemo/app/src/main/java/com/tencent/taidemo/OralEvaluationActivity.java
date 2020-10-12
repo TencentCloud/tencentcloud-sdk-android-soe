@@ -107,6 +107,7 @@ public class OralEvaluationActivity extends AppCompatActivity {
 
 
     public void onRecord(View view) {
+
         if(this.oral == null){
             this.oral = new TAIOralEvaluation();
         }
@@ -127,11 +128,9 @@ public class OralEvaluationActivity extends AppCompatActivity {
             });
         }
         else{
-            final String mp3FileName = String.format("taisdk_%d.mp3", System.currentTimeMillis()/1000);
             this.oral.setListener(new TAIOralEvaluationListener() {
                 @Override
                 public void onEvaluationData(final TAIOralEvaluationData data, final TAIOralEvaluationRet result, final TAIError error) {
-                    OralEvaluationActivity.writeFileToSDCard(data.audio, "com.tencent.taidemo", mp3FileName, true, false);
                     OralEvaluationActivity.this.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -206,6 +205,7 @@ public class OralEvaluationActivity extends AppCompatActivity {
             param.textMode = this.textModeNoramlBtn.isChecked() ? TAIOralEvaluationTextMode.NORMAL : TAIOralEvaluationTextMode.PHONEME;
             param.scoreCoeff = Double.parseDouble(this.scoreCoeff.getText().toString());
             param.refText = this.refText.getText().toString();
+            param.audioPath = this.getFilesDir() + "/" + param.sessionId + ".mp3";
             if(param.workMode == TAIOralEvaluationWorkMode.STREAM){
                 param.timeout = 5;
                 param.retryTimes = 5;
@@ -329,84 +329,11 @@ public class OralEvaluationActivity extends AppCompatActivity {
         }
     }
 
-    private void setResponse(String rsp)
-    {
+    private void setResponse(String rsp) {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss:SSS");
         String date = format.format(new Date(System.currentTimeMillis()));
         String newS = String.format("%s %s", date, rsp);
         String old = this.logText.getText().toString();
         this.logText.setText(String.format("%s\n%s", old, newS));
-    }
-
-
-    public synchronized static void writeFileToSDCard(final byte[] buffer, final String folder,
-                                                      final String fileName, final boolean append, final boolean autoLine) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                boolean sdCardExist = Environment.getExternalStorageState().equals(
-                        android.os.Environment.MEDIA_MOUNTED);
-                String folderPath = "";
-                if (sdCardExist) {
-                    //TextUtils为android自带的帮助类
-                    if (TextUtils.isEmpty(folder)) {
-                        //如果folder为空，则直接保存在sd卡的根目录
-                        folderPath = Environment.getExternalStorageDirectory()
-                                + File.separator;
-                    } else {
-                        folderPath = Environment.getExternalStorageDirectory()
-                                + File.separator + folder + File.separator;
-                    }
-                } else {
-                    return;
-                }
-
-
-                File fileDir = new File(folderPath);
-                if (!fileDir.exists()) {
-                    if (!fileDir.mkdirs()) {
-                        return;
-                    }
-                }
-                File file;
-                //判断文件名是否为空
-                if (TextUtils.isEmpty(fileName)) {
-                    file = new File(folderPath + "app_log.txt");
-                } else {
-                    file = new File(folderPath + fileName);
-                }
-                RandomAccessFile raf = null;
-                FileOutputStream out = null;
-                try {
-                    if (append) {
-                        //如果为追加则在原来的基础上继续写文件
-                        raf = new RandomAccessFile(file, "rw");
-                        raf.seek(file.length());
-                        raf.write(buffer);
-                        if (autoLine) {
-                            raf.write("\n".getBytes());
-                        }
-                    } else {
-                        //重写文件，覆盖掉原来的数据
-                        out = new FileOutputStream(file);
-                        out.write(buffer);
-                        out.flush();
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } finally {
-                    try {
-                        if (raf != null) {
-                            raf.close();
-                        }
-                        if (out != null) {
-                            out.close();
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }).start();
     }
 }
