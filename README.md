@@ -18,7 +18,7 @@ secretId和secretKey是使用SDK的安全凭证，通过以下方式获取
 在build.gradle引入依赖包
 
 ```java
-implementation 'com.tencent.edu:TAISDK:1.2.3.51'
+implementation 'com.tencent.edu:TAISDK:1.2.3.55'
 ```
 
 #### 2、接口调用
@@ -146,7 +146,7 @@ try{
     is.read(buffer);
     is.close();
     TAIOralEvaluationData data = new TAIOralEvaluationData();
-    data.seqId = 1;
+    data.seqId = 1;  //分片序号从1开始
     data.bEnd = true;
     data.audio = buffer;
     this.oral.oralEvaluation(param, data, new TAIOralEvaluationCallback() {
@@ -279,9 +279,10 @@ public String getStringToSign(long timestamp);
 |sessionId|String|是|一次批改唯一标识|
 |workMode|TAIOralEvaluationWorkMode|是|传输方式|
 |evalMode|TAIOralEvaluationEvalMode|是|评测模式|
-|fileType|TAIOralEvaluationFileType|是|数据格式（目前支持mp3）|
+|fileType|TAIOralEvaluationFileType|是|数据格式（目前支持mp3）|  
 |storageMode|TAIOralEvaluationStorageMode|是|是否存储音频文件|
-|serverType|TAIOralEvaluationServerType|是|语言类型|
+|serverType|TAIOralEvaluationServerType|是|语言类型|  
+|hostType|TAIOralEvaluationHostType|否|host类型 0:国内 1:海外|
 |scoreCoeff|double|是|苛刻指数，取值为[1.0 - 4.0]范围内的浮点数，用于平滑不同年龄段的分数，1.0为小年龄段，4.0为最高年龄段|
 |refText|String|是|被评估语音对应的文本|
 
@@ -289,7 +290,7 @@ public String getStringToSign(long timestamp);
 
 | 参数|类型|说明 |
 |---|---|---|
-|seqId|NSInteger|分片序列号|
+|seqId|NSInteger|分片序列号,从1开始|
 |bEnd|BOOL|是否最后一个分片|
 |audio|NSData|音频数据|
 
