@@ -23,7 +23,7 @@ token 不需要填写.
 在build.gradle引入依赖包
 
 ```java
-implementation 'com.tencent.edu:TAISDK:1.2.3.55'
+implementation 'com.tencent.edu:TAISDK:1.2.3.58'
 ```
 
 #### 2、接口调用
@@ -284,7 +284,8 @@ public String getStringToSign(long timestamp);
 |---|---|---|---|
 |sessionId|String|是|一次批改唯一标识|
 |workMode|TAIOralEvaluationWorkMode|是|传输方式|
-|evalMode|TAIOralEvaluationEvalMode|是|评测模式|
+|evalMode|TAIOralEvaluationEvalMode|是|评测模式|  
+|isFixOn|boolean|true:开启音素映射, false:关闭音素映射|
 |fileType|TAIOralEvaluationFileType|是|数据格式|  
 |storageMode|TAIOralEvaluationStorageMode|是|是否存储音频文件|
 |serverType|TAIOralEvaluationServerType|是|语言类型|  
@@ -323,6 +324,8 @@ public String getStringToSign(long timestamp);
 |detectedStress|boolean|当前音节是否检测为重音|
 |phone|String|当前音节|
 |stress|boolean|当前音节是否应为重音|
+|referencePhone|String|标准音素|
+|rLetter|String|音素映射的字母|
 
 * TAIOralEvaluationWord参数说明
 
