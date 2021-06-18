@@ -6,7 +6,12 @@ TAISDK是一款封装了腾讯云教育AI能力的SDK，通过集成SDK，用户
 
 secretId和secretKey是使用SDK的安全凭证，通过以下方式获取
 
-![](http://dldir1.qq.com/hudongzhibo/taisdk/document/taisdk_cloud_1.png)
+![](http://dldir1.qq.com/hudongzhibo/taisdk/document/taisdk_cloud_1.png)  
+获取到秘钥后到tencentcloud-sdk-android-soe/TAIDemo/app/src/main/java/com/tencent/taidemo/PrivateInfo.java填入对应的appId ,secretId ,secretKey.
+soeAppId 和hcmAppId根据需要填写.需要到控制台新建.  
+soe控制台:https://console.cloud.tencent.com/soe/index/setting_en  
+hcm控制台:https://console.cloud.tencent.com/hcm/app  
+token 不需要填写.
 
 
 ### 二、SDK集成
@@ -18,7 +23,7 @@ secretId和secretKey是使用SDK的安全凭证，通过以下方式获取
 在build.gradle引入依赖包
 
 ```java
-implementation 'com.tencent.edu:TAISDK:1.2.3.51'
+implementation 'com.tencent.edu:TAISDK:1.2.3.55'
 ```
 
 #### 2、接口调用
@@ -88,7 +93,7 @@ param.workMode = TAIOralEvaluationWorkMode.ONCE;
 param.evalMode = TAIOralEvaluationEvalMode.SENTENCE;
 param.storageMode = TAIOralEvaluationStorageMode.DISABLE;
 param.serverType = TAIOralEvaluationServerType.ENGLISH;
-param.fileType = TAIOralEvaluationFileType.MP3;//只支持mp3
+param.fileType = TAIOralEvaluationFileType.MP3;
 param.scoreCoeff = 1.0;
 param.refText = "";
 param.secretId = "";
@@ -134,7 +139,7 @@ param.workMode = TAIOralEvaluationWorkMode.ONCE;
 param.evalMode = TAIOralEvaluationEvalMode.SENTENCE;
 param.storageMode = TAIOralEvaluationStorageMode.DISABLE;
 param.serverType = TAIOralEvaluationServerType.ENGLISH;
-param.fileType = TAIOralEvaluationFileType.MP3;//只支持mp3
+param.fileType = TAIOralEvaluationFileType.MP3;
 param.scoreCoeff = 1.0;
 param.refText = "hello guagua";
 param.secretId = "";
@@ -146,7 +151,7 @@ try{
     is.read(buffer);
     is.close();
     TAIOralEvaluationData data = new TAIOralEvaluationData();
-    data.seqId = 1;
+    data.seqId = 1;  //分片序号从1开始
     data.bEnd = true;
     data.audio = buffer;
     this.oral.oralEvaluation(param, data, new TAIOralEvaluationCallback() {
@@ -206,7 +211,8 @@ public void onVolumeChanged(final int volume) {
 
 secretKey属于安全敏感参数，线上版本一般由业务后台生成[临时secretKey](https://cloud.tencent.com/document/api/598/13895)或者SDK外部签名返回到客户端。
 
->（1）内部签名：sdk内部通过用户提供的secretKey和secretId计算签名，用户无需关心签名细节
+>（1）内部签名：sdk内部通过用户提供的secretKey和secretId计算签名，用户无需关心签名细节  
+
 >（2）外部签名：sdk外部调用getStringToSign获取签名字符串，然后根据[签名规则（参考步骤三）](https://cloud.tencent.com/document/product/884/30657) 进行签名。口语评测时需提供secretId、timestamp和signature参数
 
 ```java
@@ -279,9 +285,10 @@ public String getStringToSign(long timestamp);
 |sessionId|String|是|一次批改唯一标识|
 |workMode|TAIOralEvaluationWorkMode|是|传输方式|
 |evalMode|TAIOralEvaluationEvalMode|是|评测模式|
-|fileType|TAIOralEvaluationFileType|是|数据格式（目前支持mp3）|
+|fileType|TAIOralEvaluationFileType|是|数据格式|  
 |storageMode|TAIOralEvaluationStorageMode|是|是否存储音频文件|
-|serverType|TAIOralEvaluationServerType|是|语言类型|
+|serverType|TAIOralEvaluationServerType|是|语言类型|  
+|hostType|TAIOralEvaluationHostType|否|host类型 0:国内 1:海外|
 |scoreCoeff|double|是|苛刻指数，取值为[1.0 - 4.0]范围内的浮点数，用于平滑不同年龄段的分数，1.0为小年龄段，4.0为最高年龄段|
 |refText|String|是|被评估语音对应的文本|
 
@@ -289,7 +296,7 @@ public String getStringToSign(long timestamp);
 
 | 参数|类型|说明 |
 |---|---|---|
-|seqId|NSInteger|分片序列号|
+|seqId|NSInteger|分片序列号,从1开始|
 |bEnd|BOOL|是否最后一个分片|
 |audio|NSData|音频数据|
 
