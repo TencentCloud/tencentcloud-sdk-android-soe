@@ -23,7 +23,7 @@ token 不需要填写.
 在build.gradle引入依赖包
 
 ```java
-implementation 'com.tencent.edu:TAISDK:1.2.3.58'
+implementation 'com.tencent.edu:TAISDK:1.2.3.60'
 ```
 
 #### 2、接口调用
@@ -180,15 +180,16 @@ recordParam.fragSize = 1024;
 recordParam.fragEnable = true;
 recordParam.vadEnable = true;
 recordParam.vadInterval = 5000;
+recordParam.db = 20;  //静音检测分贝阈值
 this.oral.setRecorderParam(recordParam);
 ```
 
 当检测到静音或者录音分贝变化时，通过`TAIOralEvaluationListener`通知上层。
 
 ```java
-//检测到静音
+//检测到静音 isSpeak true:录音开始到现在检测到声音 false:未检测到声音
 @Override
-public void onEndOfSpeech() {
+public void onEndOfSpeech(boolean isSpeak) {
     //这里可以根据业务逻辑处理，如停止录音或提示用户
 }
 
@@ -206,6 +207,7 @@ public void onVolumeChanged(final int volume) {
 |fragSize|int|分片大小，默认1024，建议为1024的整数倍，范围【1k-10k】|
 |vadEnable|boolean|是否开启静音检测，默认NO|
 |vadInterval|int|静音检测时间间隔，单位【ms】|
+|db|int|静音检测分贝阈值|
 
 #### 3、签名
 
