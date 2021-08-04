@@ -3,12 +3,10 @@ package com.tencent.taidemo;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.text.TextUtils;
-import android.util.Log;
+import android.text.method.ScrollingMovementMethod;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -33,11 +31,7 @@ import com.tencent.taisdk.TAIOralEvaluationTextMode;
 import com.tencent.taisdk.TAIOralEvaluationWorkMode;
 import com.tencent.taisdk.TAIRecorderParam;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.RandomAccessFile;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
@@ -72,6 +66,7 @@ public class OralEvaluationActivity extends AppCompatActivity {
         this.refText = this.findViewById(R.id.refText);
         this.refText.setText("how are you");
         this.logText = this.findViewById(R.id.logText);
+        logText.setMovementMethod(ScrollingMovementMethod.getInstance());
         this.recordBtn = this.findViewById(R.id.recordBtn);
         this.localRecordBtn = this.findViewById(R.id.localRecordBtn);
         this.workOnceBtn = this.findViewById(R.id.workOnceBtn);
@@ -146,7 +141,12 @@ public class OralEvaluationActivity extends AppCompatActivity {
                 }
 
                 @Override
-                public void onEndOfSpeech() {
+                public void onFinalEvaluationData(TAIOralEvaluationData taiOralEvaluationData, TAIOralEvaluationRet taiOralEvaluationRet, TAIError taiError) {
+                    
+                }
+
+                @Override
+                public void onEndOfSpeech(boolean b) {
                     OralEvaluationActivity.this.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -155,6 +155,8 @@ public class OralEvaluationActivity extends AppCompatActivity {
                         }
                     });
                 }
+
+           
 
                 @Override
                 public void onVolumeChanged(final int volume) {
@@ -261,7 +263,12 @@ public class OralEvaluationActivity extends AppCompatActivity {
                 }
 
                 @Override
-                public void onEndOfSpeech() {
+                public void onFinalEvaluationData(TAIOralEvaluationData taiOralEvaluationData, TAIOralEvaluationRet taiOralEvaluationRet, TAIError taiError) {
+                    
+                }
+
+                @Override
+                public void onEndOfSpeech(boolean isSpeak) {
 
                 }
 

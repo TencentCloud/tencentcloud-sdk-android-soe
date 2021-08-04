@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+   
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -194,9 +192,7 @@
             android:layout_height="wrap_content"
             android:text="@string/local_mp3"
             android:onClick="onLocalRecord"/>
-        <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+       
             <TextView
                 android:id="@+id/logText"
                 android:layout_width="match_parent"
@@ -204,8 +200,8 @@
                 android:enabled="true"
                 android:textIsSelectable="true"
                 android:focusable="true"
+                android:scrollbars="vertical"
+                android:fadeScrollbars="false"
                 android:longClickable="true" />
-        </ScrollView>
     </LinearLayout>
-    </ScrollView>
-</android.support.constraint.ConstraintLayout>
+</android.support.v4.widget.NestedScrollView>

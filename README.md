@@ -23,7 +23,7 @@ token 不需要填写.
 在build.gradle引入依赖包
 
 ```java
-implementation 'com.tencent.edu:TAISDK:1.2.3.62'
+implementation 'com.tencent.edu:TAISDK:1.2.3.63'
 ```
 
 #### 2、接口调用
