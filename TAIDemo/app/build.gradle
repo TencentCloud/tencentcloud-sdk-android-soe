@@ -22,7 +22,7 @@ android {
         versionCode 1
         versionName "1.0"
         ndk {
-            abiFilters 'armeabi', 'armeabi-v7a'
+            abiFilters 'armeabi-v7a'
         }
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
@@ -40,5 +40,5 @@ dependencies {
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     implementation 'com.android.support:appcompat-v7:27.1.1'
     implementation 'com.google.code.gson:gson:2.8.6'
-    implementation 'com.tencent.edu:TAISDK:1.2.3.63'
+    implementation 'com.tencent.edu:TAISDK:1.2.3.65'
 }
