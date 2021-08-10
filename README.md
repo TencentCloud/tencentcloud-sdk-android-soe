@@ -23,18 +23,9 @@ token 不需要填写.
 在build.gradle引入依赖包
 
 ```java
-implementation 'com.tencent.edu:TAISDK:1.2.3.65'
+implementation 'com.tencent.edu:TAISDK:1.2.3.67'
 ```
 
- #### 指定 App 使用架构
-在`defaultConfig`中，指定 App 使用的 CPU 架构（目前 TAISDK 支持`armeabi`和`armeabi-v7a`)。
-```groovy
-  defaultConfig {
-      ndk {
-          abiFilters "armeabi", "armeabi-v7a"
-      }
-  }
-```  
 #### 2、接口调用
 
 
