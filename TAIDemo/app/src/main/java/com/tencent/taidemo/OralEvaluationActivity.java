@@ -7,6 +7,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.method.ScrollingMovementMethod;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -15,10 +16,8 @@ import android.widget.RadioButton;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
-import com.tencent.taisdk.TAIErrCode;
 import com.tencent.taisdk.TAIError;
 import com.tencent.taisdk.TAIOralEvaluation;
-import com.tencent.taisdk.TAIOralEvaluationCallback;
 import com.tencent.taisdk.TAIOralEvaluationData;
 import com.tencent.taisdk.TAIOralEvaluationEvalMode;
 import com.tencent.taisdk.TAIOralEvaluationFileType;
@@ -38,6 +37,7 @@ import java.util.UUID;
 
 
 public class OralEvaluationActivity extends AppCompatActivity {
+    private static final String TAG = OralEvaluationActivity.class.getSimpleName();
     private TAIOralEvaluation oral;
     private EditText refText;
     private TextView logText;
@@ -59,6 +59,7 @@ public class OralEvaluationActivity extends AppCompatActivity {
     private EditText fragSize;
     private EditText vadInterval;
     private ProgressBar vadVolume;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -103,46 +104,69 @@ public class OralEvaluationActivity extends AppCompatActivity {
 
     public void onRecord(View view) {
 
-        if(this.oral == null){
+        if (this.oral == null) {
             this.oral = new TAIOralEvaluation();
         }
-        if(oral.isRecording()){
-            this.oral.stopRecordAndEvaluation(new TAIOralEvaluationCallback() {
-                @Override
-                public void onResult(final TAIError error) {
-                    OralEvaluationActivity.this.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Gson gson = new Gson();
-                            String string = gson.toJson(error);
-                            OralEvaluationActivity.this.setResponse(String.format("stopRecordAndEvaluation:%s", string));
-                            OralEvaluationActivity.this.recordBtn.setText(R.string.start_record);
-                        }
-                    });
-                }
-            });
-        }
-        else{
+        if (oral.isRecording()) {
+            this.oral.stopRecordAndEvaluation();
+            setResponse("stopRecordAndEvaluation");
+            recordBtn.setText(R.string.start_record);
+        } else {
             this.oral.setListener(new TAIOralEvaluationListener() {
                 @Override
-                public void onEvaluationData(final TAIOralEvaluationData data, final TAIOralEvaluationRet result, final TAIError error) {
+                public void onEvaluationData(final TAIOralEvaluationData data, final TAIOralEvaluationRet result) {
                     OralEvaluationActivity.this.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            if(error.code != TAIErrCode.SUCC){
-                                OralEvaluationActivity.this.recordBtn.setText(R.string.start_record);
-                            }
                             Gson gson = new Gson();
-                            String errString = gson.toJson(error);
                             String retString = gson.toJson(result);
-                            OralEvaluationActivity.this.setResponse(String.format("oralEvaluation:seq:%d, end:%d, error:%s, ret:%s", data.seqId, data.bEnd ? 1 : 0, errString, retString));
+                            Log.w(TAG, "onEvaluationData isEnd: " + data.bEnd);
+                            Log.d(TAG, "onEvaluationData onRecordretString: " + retString);
+                            String tempRes = String.format("oralEvaluation:seq:%d, end:%d,  ret:%s", data.seqId, data.bEnd ? 1 : 0, retString);
+
+                            setResponse(tempRes);
+                            Log.w(TAG, "onEvaluationData tempRes:" + tempRes);
                         }
                     });
                 }
 
                 @Override
-                public void onFinalEvaluationData(TAIOralEvaluationData taiOralEvaluationData, TAIOralEvaluationRet taiOralEvaluationRet, TAIError taiError) {
-                    
+                public void onFinalEvaluationData(final TAIOralEvaluationData data, final TAIOralEvaluationRet result) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Gson gson = new Gson();
+                            String retString = gson.toJson(result);
+                            Log.d(TAG, "onFinalEvaluationData isEnd: " + data.bEnd);
+                            Log.v(TAG, "onFinalEvaluationData onRecordretString: " + retString);
+                            String tempRes = String.format("onFinalEvaluationData:seq:%d, end:%d,  ret:%s", data.seqId, data.bEnd ? 1 : 0, retString);
+
+                            setResponse(tempRes);
+                            Log.e(TAG, "onFinalEvaluationData tempRes:" + tempRes);
+                        }
+                    });
+                }
+
+                @Override
+                public void onEvaluationError(TAIOralEvaluationData data, TAIError error) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            OralEvaluationActivity.this.recordBtn.setText(R.string.start_record);
+                            Gson gson = new Gson();
+                            String retString = gson.toJson(error);
+                            String errorStr = "onEvaluationError: " + retString + " seqId: " + data.seqId;
+                            setResponse(errorStr);
+                            Log.e(TAG, "onEvaluationError errorStr:" + errorStr);
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    recordBtn.setText(R.string.start_record);
+                                }
+                            });
+                        }
+                    });
+
                 }
 
                 @Override
@@ -156,7 +180,6 @@ public class OralEvaluationActivity extends AppCompatActivity {
                     });
                 }
 
-           
 
                 @Override
                 public void onVolumeChanged(final int volume) {
@@ -169,11 +192,11 @@ public class OralEvaluationActivity extends AppCompatActivity {
                 }
             });
 
-            if(this.scoreCoeff.getText().toString().equals("")){
+            if (this.scoreCoeff.getText().toString().equals("")) {
                 this.setResponse("startRecordAndEvaluation:scoreCoeff invalid");
                 return;
             }
-            if(this.fragSize.getText().toString().equals("")){
+            if (this.fragSize.getText().toString().equals("")) {
                 this.setResponse("startRecordAndEvaluation:fragSize invalid");
                 return;
             }
@@ -187,16 +210,13 @@ public class OralEvaluationActivity extends AppCompatActivity {
             param.secretKey = PrivateInfo.secretKey;
             param.token = PrivateInfo.token;
             int evalMode = TAIOralEvaluationEvalMode.SENTENCE;
-            if(this.evalWordBtn.isChecked()){
+            if (this.evalWordBtn.isChecked()) {
                 evalMode = TAIOralEvaluationEvalMode.WORD;
-            }
-            else if(this.evalSentenceBtn.isChecked()){
+            } else if (this.evalSentenceBtn.isChecked()) {
                 evalMode = TAIOralEvaluationEvalMode.SENTENCE;
-            }
-            else if(this.evalParagraphBtn.isChecked()){
+            } else if (this.evalParagraphBtn.isChecked()) {
                 evalMode = TAIOralEvaluationEvalMode.PARAGRAPH;
-            }
-            else if(this.evalFreeBtn.isChecked()){
+            } else if (this.evalFreeBtn.isChecked()) {
                 evalMode = TAIOralEvaluationEvalMode.FREE;
             }
             param.workMode = this.workOnceBtn.isChecked() ? TAIOralEvaluationWorkMode.ONCE : TAIOralEvaluationWorkMode.STREAM;
@@ -208,63 +228,68 @@ public class OralEvaluationActivity extends AppCompatActivity {
             param.scoreCoeff = Double.parseDouble(this.scoreCoeff.getText().toString());
             param.refText = this.refText.getText().toString();
             param.audioPath = this.getFilesDir() + "/" + param.sessionId + ".mp3";
-            if(param.workMode == TAIOralEvaluationWorkMode.STREAM){
+            if (param.workMode == TAIOralEvaluationWorkMode.STREAM) {
                 param.timeout = 5;
                 param.retryTimes = 5;
-            }
-            else{
+            } else {
                 param.timeout = 30;
                 param.retryTimes = 0;
             }
             TAIRecorderParam recordParam = new TAIRecorderParam();
-            recordParam.fragSize = (int)(Double.parseDouble(this.fragSize.getText().toString()) * 1024);
+            recordParam.fragSize = (int) (Double.parseDouble(this.fragSize.getText().toString()) * 1024);
             recordParam.fragEnable = !this.workOnceBtn.isChecked();
             recordParam.vadEnable = true;
             recordParam.vadInterval = Integer.parseInt(this.vadInterval.getText().toString());
             this.oral.setRecorderParam(recordParam);
-            this.oral.startRecordAndEvaluation(param, new TAIOralEvaluationCallback() {
-                @Override
-                public void onResult(final TAIError error) {
-                    OralEvaluationActivity.this.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            if(error.code == TAIErrCode.SUCC){
-                                OralEvaluationActivity.this.recordBtn.setText(R.string.stop_record);
-                            }
-                            Gson gson = new Gson();
-                            String string = gson.toJson(error);
-                            OralEvaluationActivity.this.setResponse(String.format("startRecordAndEvaluation:%s", string));
-                        }
-                    });
-                }
-            });
+            this.oral.startRecordAndEvaluation(param);
+            OralEvaluationActivity.this.recordBtn.setText(R.string.stop_record);
         }
     }
 
-    public void onLocalRecord(View view)
-    {
-        if(this.oral == null){
+    public void onLocalRecord(View view) {
+        if (this.oral == null) {
             this.oral = new TAIOralEvaluation();
             this.oral.setListener(new TAIOralEvaluationListener() {
                 @Override
-                public void onEvaluationData(final TAIOralEvaluationData data, final TAIOralEvaluationRet result, final TAIError error) {
+                public void onEvaluationData(final TAIOralEvaluationData data, final TAIOralEvaluationRet result) {
                     OralEvaluationActivity.this.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            if(error.code != TAIErrCode.SUCC){
-                                OralEvaluationActivity.this.recordBtn.setText(R.string.start_record);
-                            }
+
                             Gson gson = new Gson();
-                            String errString = gson.toJson(error);
                             String retString = gson.toJson(result);
-                            OralEvaluationActivity.this.setResponse(String.format("oralEvaluation:seq:%d, end:%d, error:%s, ret:%s", data.seqId, data.bEnd ? 1 : 0, errString, retString));
+                            Log.d("onEvaluationData", "retString: " + retString);
+                            String tempRes = String.format("oralEvaluation:seq:%d, end:%d, ret:%s", data.seqId, data.bEnd ? 1 : 0, retString);
+                            OralEvaluationActivity.this.setResponse(tempRes);
+
                         }
                     });
                 }
 
                 @Override
-                public void onFinalEvaluationData(TAIOralEvaluationData taiOralEvaluationData, TAIOralEvaluationRet taiOralEvaluationRet, TAIError taiError) {
-                    
+                public void onFinalEvaluationData(TAIOralEvaluationData data, TAIOralEvaluationRet result) {
+
+                }
+
+                @Override
+                public void onEvaluationError(TAIOralEvaluationData data, TAIError error) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            OralEvaluationActivity.this.recordBtn.setText(R.string.start_record);
+                            Gson gson = new Gson();
+                            String retString = gson.toJson(error);
+                            String errorStr = "onEvaluationError: " + retString + " seqId: " + data.seqId;
+                            setResponse(errorStr);
+                            Log.e(TAG, "onEvaluationError errorStr:" + errorStr);
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    recordBtn.setText(R.string.start_record);
+                                }
+                            });
+                        }
+                    });
                 }
 
                 @Override
@@ -295,7 +320,7 @@ public class OralEvaluationActivity extends AppCompatActivity {
         param.scoreCoeff = Double.parseDouble(this.scoreCoeff.getText().toString());
         param.refText = "hello guagua";
 
-        try{
+        try {
             InputStream is = getAssets().open("hello_guagua.mp3");
             byte[] buffer = new byte[is.available()];
             is.read(buffer);
@@ -304,29 +329,15 @@ public class OralEvaluationActivity extends AppCompatActivity {
             data.seqId = 1;
             data.bEnd = true;
             data.audio = buffer;
-            this.oral.oralEvaluation(param, data, new TAIOralEvaluationCallback() {
-                @Override
-                public void onResult(final TAIError error) {
-                    OralEvaluationActivity.this.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Gson gson = new Gson();
-                            String string = gson.toJson(error);
-                            OralEvaluationActivity.this.setResponse(String.format("oralEvaluation:%s", string));
-                        }
-                    });
-                }
-            });
-        }
-        catch (Exception e){
+            this.oral.oralEvaluation(param, data);
+        } catch (Exception e) {
 
         }
 
 
     }
 
-    private void requestPermission()
-    {
+    private void requestPermission() {
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.RECORD_AUDIO)
                 != PackageManager.PERMISSION_GRANTED) {

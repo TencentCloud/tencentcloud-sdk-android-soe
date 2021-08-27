@@ -23,7 +23,7 @@ token 不需要填写.
 在build.gradle引入依赖包
 
 ```java
-implementation 'com.tencent.edu:TAISDK:1.2.3.67'
+implementation 'com.tencent.edu:TAISDK:1.2.3.69'
 ```
 
 #### 2、接口调用
@@ -75,8 +75,18 @@ private TAIOralEvaluation oral = new TAIOralEvaluation();
 //二、设置数据回调
 this.oral.setListener(new TAIOralEvaluationListener() {
     @Override
-    public void onEvaluationData(final TAIOralEvaluationData data, final TAIOralEvaluationRet result, final TAIError error) {
-        //数据和结果回调（只有data.bEnd为true，result有效）
+    public void onEvaluationData(final TAIOralEvaluationData data, final TAIOralEvaluationRet result) {
+        //数据和结果回调
+    }
+
+    @Override
+    public void onFinalEvaluationData(final TAIOralEvaluationData data, final TAIOralEvaluationRet result) {
+        //最终评测结果回调
+    }
+
+     @Override
+    public void onEvaluationError(TAIOralEvaluationData data, TAIError error) {
+        //评测失败回调
     }
 });
 ```
@@ -106,23 +116,13 @@ recordParam.vadEnable = true;
 recordParam.vadInterval = Integer.parseInt(this.vadInterval.getText().toString());
 this.oral.setRecorderParam(recordParam);
 //五、开始录制
-this.oral.startRecordAndEvaluation(param, new TAIOralEvaluationCallback() {
-    @Override
-    public void onResult(final TAIError error) {
-        //结果返回
-    }
-});
+this.oral.startRecordAndEvaluation(param);
 
 ```
 
 ```java
 //五、结束录制
-this.oral.stopRecordAndEvaluation(new TAIOralEvaluationCallback() {
-    @Override
-    public void onResult(final TAIError error) {
-        //结果返回
-    }
-});
+this.oral.stopRecordAndEvaluation();
 ```
 
 
@@ -154,12 +154,7 @@ try{
     data.seqId = 1;  //分片序号从1开始
     data.bEnd = true;
     data.audio = buffer;
-    this.oral.oralEvaluation(param, data, new TAIOralEvaluationCallback() {
-        @Override
-        public void onResult(final TAIError error) {
-            //接口调用结果返回
-        }
-    });
+    this.oral.oralEvaluation(param, data);
 }
 catch (Exception e){
 
