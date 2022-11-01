@@ -235,6 +235,28 @@ public class OralEvaluationActivity extends AppCompatActivity {
                 param.timeout = 30;
                 param.retryTimes = 0;
             }
+
+//            param.evalMode = 2;
+//            param.refText = "It was Mother’s Day. Tom stopped his car outside a flower shop. He wanted to order some beautiful flowers and ask " +
+//                    "the shop to deliver them to his mother. When he was about to enter the shop, he saw a little girl crying on the roadside. " +
+//                    "Tom walked to her and asked what happened. The girl told him she wanted to buy a rose for her mother, but she had no money." +
+//                    " Hearing this, Tom took the girl’s hand and entered the flower shop. He ordered the flowers for his mother and bought a " +
+//                    "beautiful rose for the girl. Then he offered to drive the girl home. But the girl said that she was not going home; " +
+//                    "she was going to the bus station. Her mother worked in another town. She must go to her today with the rose. Tom was touched. " +
+//                    "He changed his mind. After driving the girl to the bus station, he returned to the shop, canceled the delivery service and bought a " +
+//                    "larger bunch of flowers and a box of chocolates. After Tom left the shop, he drove all the way to his mother’s place. " +
+//                    "He would give the flowers to his mother in person.";
+//            param.keyword = "It was Mother’s Day.| Tom went to a flower shop and wanted to ask the shop to send some flowers to his mother." +
+//                    " | Tom saw a little girl crying on the roadside before he entered the shop. | The girl said she had no money to buy a rose for her mother. " +
+//                    "| He bought a rose for the girl and offered to drive her home. | The girl was going to give the rose to her mother in another town. " +
+//                    " | Tom was touched and changed his mind. | He returned to the flower shop after driving the girl to the bus station. " +
+//                    "| He canceled the delivery service and bought more flowers and some chocolates. | He would give the flowers to his mother in person.";
+//
+//
+//            param.evalMode = 5;
+//            param.refText = "I need a hat. | I want to buy a hat. | Yes, please. I want a hat.";
+//            param.keyword = "I need | hat # I want | buy | hat";
+
             TAIRecorderParam recordParam = new TAIRecorderParam();
             recordParam.fragSize = (int) (Double.parseDouble(this.fragSize.getText().toString()) * 1024);
             recordParam.fragEnable = !this.workOnceBtn.isChecked();
